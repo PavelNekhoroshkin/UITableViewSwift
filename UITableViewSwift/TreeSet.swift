@@ -6,13 +6,58 @@
 //  Copyright © 2020 Павел Нехорошкин. All rights reserved.
 //
 
-import Foundation
+//import Foundation
 
 /// Красно-черное дерево String
-final class TreeSet {
+final class TreeSet : IteratorProtocol {
+    func next() -> String? {
+       return getNext()?.value
+    }
+    
+    typealias Element = String
     
     private var root: Entry?
     var count = 0
+    private var pointer : Entry?
+    
+    private func getNext() -> Entry? {
+        
+        guard let root = root else {
+            return nil
+        }
+        // начало обхода дерева с самого левого узла
+        guard let curent = pointer else {
+            pointer = root
+            while let left = pointer?.left {
+                    pointer = left
+            }
+            return pointer
+        }
+        //продолжение обхода дерева, есть правый узел
+        if let curent = curent.right {
+            pointer = curent
+            while let left = pointer?.left  {
+                pointer = left
+            }
+            return pointer
+        }
+        //продолжение обхода дерева, правого узла нет 
+        if curent.isLeft {
+            pointer = curent.parent
+            return pointer
+        }
+        
+        while let parent = pointer?.parent {
+            pointer = parent
+            if parent.isLeft {
+                pointer = pointer?.parent
+                return pointer
+            }
+        }
+        
+        pointer = nil
+        return pointer
+    }
     
     /// Высота не пустого дерева это максимум высот левой и правой ветви  плюс 1
     var height : Int {
@@ -32,6 +77,7 @@ final class TreeSet {
         var parent : Entry?
         var value : String
         var isRed = false
+        var isLeft = false
         var left : Entry?
         var right: Entry?
         
@@ -228,19 +274,7 @@ final class TreeSet {
         var parent = root
         var nextEntry: Entry? = root
         
-        while true {
-            guard let existedEntry = nextEntry else {
-                //дошли до листа (nil), добавляем новую запись
-                newEntry.parent = parent
-                if newEntry.value > parent.value {
-                    parent.right = newEntry
-                } else {
-                    parent.left = newEntry
-                }
-                count += 1
-                insertCase1(newEntry)
-                break
-            }
+        while let existedEntry = nextEntry {
             parent = existedEntry
             if newEntry.value == existedEntry.value {
                 //узел уже есть
@@ -251,6 +285,16 @@ final class TreeSet {
                 nextEntry = existedEntry.left
             }
         }
+       
+        //дошли до листа (nil), добавляем новую запись
+        newEntry.parent = parent
+        if newEntry.value > parent.value {
+            parent.right = newEntry
+        } else {
+            parent.left = newEntry
+        }
+        count += 1
+        insertCase1(newEntry)
     }
     
     /// Печатает полную структуру дерева

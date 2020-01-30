@@ -8,69 +8,33 @@
 
 import Foundation
 
-class DownloadService  {
+/// Ошибки загрузки
+///
+/// - downloadError: ошибка загрузки, содержит Error c описанием.
+/// - unknown: данные не были получены, но описание ошибки отсутствует
+enum DownloadError : Error {
+    case downloadError(Error)
+    case unknown(String)
+}
+
+/// Класс для загрузи данных
+final class DownloadService  {
     
-    let viewController : ViewController
+    private let url = "https://pokeapi.co/api/v2/pokemon?limit=1500"
     
-    init(viewController: ViewController) {
-        self.viewController = viewController
-    }
-    
-    func downloadList() {
+    /// Выполнить запрос по url
+    ///
+    /// - Parameter completionHandler: замыкание, вызываемое в background после завершения загрузки
+    func downloadList(completionHandler: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
         let configuration = URLSessionConfiguration.default
         let session = URLSession(configuration: configuration)
         
-        guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=1500") else {
+        guard let url = URL(string: url) else {
             return
         }
-        let task = session.dataTask(with: url) { data, response, error in
-            
-            guard error == nil, let content = data  else {
-                print ("ERROR: \(error!)")
-                return
-            }
-            
-            guard data != nil else {
-                print("Нет данных")
-                return
-            }
-            
-            switch content.count % 10 {
-                case 2, 3, 4 :
-                     print("Загружено \(content.count) байта")
-                default :
-                     print("Загружено \(content.count) байт")
-            }
-            
-            guard let json = (try? JSONSerialization.jsonObject(with: content, options: JSONSerialization.ReadingOptions.mutableContainers)) as? [String: Any] else {
-                print("JSON не распознан")
-                return
-            }
-
-            guard let array = (json["results"] as? Array<Dictionary<String, String>>) else {
-                return
-            }
-            
-            switch array.count % 10 {
-                case 1 :
-                    print("Найдено \(array.count) имя")
-                case 2, 3, 4 :
-                    print("Найдено \(array.count) имени")
-                default :
-                    print("Найдено \(array.count) имен")
-            }
-           
-            for item in array {
-                if let name = item["name"] {
-                    DataStore.addToStore(name: name)
-                }
-            }
-            
-            DispatchQueue.main.async(execute: {
-                self.viewController.button.setTitle("ПОКАЗАТЬ СПИСОК", for: .normal)
-                self.viewController.showTableView()
-            })
-        }
+        
+        let task = session.dataTask(with: url, completionHandler: completionHandler)
+        
         task.resume()
     }
     

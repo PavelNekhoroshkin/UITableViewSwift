@@ -10,10 +10,10 @@
 		E92051A123D9C45E00D1271F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92051A023D9C45E00D1271F /* AppDelegate.swift */; };
 		E92051A323D9C45E00D1271F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92051A223D9C45E00D1271F /* ViewController.swift */; };
 		E92051A823D9C46200D1271F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E92051A723D9C46200D1271F /* Assets.xcassets */; };
-		E92051B323D9D4FE00D1271F /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92051B223D9D4FE00D1271F /* TableViewController.swift */; };
-		E92051B723E0CE1200D1271F /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92051B623E0CE1200D1271F /* DataStore.swift */; };
+		E92051B723E0CE1200D1271F /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92051B623E0CE1200D1271F /* Store.swift */; };
 		E92051B923E0CE6600D1271F /* TreeSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92051B823E0CE6600D1271F /* TreeSet.swift */; };
 		E92051BC23E0D06700D1271F /* DownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92051BB23E0D06700D1271F /* DownloadService.swift */; };
+		E92051C223E320AC00D1271F /* PokemonParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92051C123E320AC00D1271F /* PokemonParser.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,10 +22,10 @@
 		E92051A223D9C45E00D1271F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		E92051A723D9C46200D1271F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E92051AC23D9C46200D1271F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E92051B223D9D4FE00D1271F /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
-		E92051B623E0CE1200D1271F /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
+		E92051B623E0CE1200D1271F /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		E92051B823E0CE6600D1271F /* TreeSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeSet.swift; sourceTree = "<group>"; };
 		E92051BB23E0D06700D1271F /* DownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadService.swift; sourceTree = "<group>"; };
+		E92051C123E320AC00D1271F /* PokemonParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonParser.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,9 +60,9 @@
 			children = (
 				E92051A023D9C45E00D1271F /* AppDelegate.swift */,
 				E92051A223D9C45E00D1271F /* ViewController.swift */,
-				E92051B223D9D4FE00D1271F /* TableViewController.swift */,
 				E92051BB23E0D06700D1271F /* DownloadService.swift */,
-				E92051B623E0CE1200D1271F /* DataStore.swift */,
+				E92051C123E320AC00D1271F /* PokemonParser.swift */,
+				E92051B623E0CE1200D1271F /* Store.swift */,
 				E92051B823E0CE6600D1271F /* TreeSet.swift */,
 				E92051A723D9C46200D1271F /* Assets.xcassets */,
 				E92051AC23D9C46200D1271F /* Info.plist */,
@@ -140,9 +140,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E92051A323D9C45E00D1271F /* ViewController.swift in Sources */,
-				E92051B723E0CE1200D1271F /* DataStore.swift in Sources */,
+				E92051B723E0CE1200D1271F /* Store.swift in Sources */,
 				E92051B923E0CE6600D1271F /* TreeSet.swift in Sources */,
-				E92051B323D9D4FE00D1271F /* TableViewController.swift in Sources */,
+				E92051C223E320AC00D1271F /* PokemonParser.swift in Sources */,
 				E92051A123D9C45E00D1271F /* AppDelegate.swift in Sources */,
 				E92051BC23E0D06700D1271F /* DownloadService.swift in Sources */,
 			);

@@ -8,62 +8,122 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
     
-    let spinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.white)
-    let button = UIButton(type: .custom)
+    private lazy var spinner = {
+        UIActivityIndicatorView(style: .white)
+    }()
+    private lazy var tableView: UITableView = {
+        let view = UITableView(frame: CGRect.zero, style: .plain)
+        view.dataSource = self
+        view.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        return view
+    }()
+    private lazy var store : DataStore = {
+        Store()
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationItem.title = "pokeapi.co"
+        navigationItem.title = "pokeapi.co"
         
-        button.backgroundColor = .clear
-        button.layer.cornerRadius = 5
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.black.cgColor
-        button.setTitle("ЗАГРУЗИТЬ СПИСОК", for: .normal)
-        button.addTarget(self, action: #selector(ViewController.getPokemonList), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false;
-        spinner.translatesAutoresizingMaskIntoConstraints = false;
-        view.addSubview(button)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.isHidden = true
+        view.addSubview(tableView)
         view.addSubview(spinner)
-        view.addConstraints( generateConstraints() )
+        setupConstraints()
+        getPokemonList()
     }
     
-
-   
-    private func generateConstraints() -> [NSLayoutConstraint] {
-       
-        let constraintWidthButton = NSLayoutConstraint(item: button, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 200.0)
-        let constraintHeightButton = NSLayoutConstraint(item: button, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 80)
-        let constraintTopButton = NSLayoutConstraint(item: button, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1.0, constant: 180)
-        let constraintCenterXButton = NSLayoutConstraint(item: button, attribute: .centerX, relatedBy: .equal, toItem: view, attribute: .centerX, multiplier: 1.0,constant: 0.0)
-        let constraintCenterXSpinner = NSLayoutConstraint(item: spinner, attribute: .centerX, relatedBy: .equal, toItem: view, attribute: .centerX, multiplier: 1.0,constant: 0.0)
-        let constraintCenterYSpinner = NSLayoutConstraint(item: spinner, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 1.0,constant: 0.0)
-        
-        return [constraintWidthButton, constraintHeightButton, constraintTopButton, constraintCenterXButton, constraintCenterXSpinner, constraintCenterYSpinner]
+    private func setupConstraints()  {
+        NSLayoutConstraint.activate([
+            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            ])
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.rightAnchor)
+            ])
     }
     
-    @objc func getPokemonList() {
-        if DataStore.isEmpty() {
-            downloadPokemonList()
-        } else {
-            showTableView()
+    /// Получение данных и загрузка в пустое хранилище
+    private func getPokemonList() {
+        guard store.count ==  0  else {
+            return
+        }
+        fetchList { [weak self] result in
+            switch result {
+            case .failure(let error):
+                print(error)
+            case .success(let content):
+                let parser = PokemonParser()
+                let names = parser.parse(content: content)
+                names.forEach {
+                    self?.store.addToStore(name: $0)
+                }
+                self?.updateList()
+            }
         }
     }
     
-    func downloadPokemonList() {
+    /// Инициировать запрос на загрузку JSON
+    ///
+    /// - Parameter completion: замыкание, выполняющее обработку загруженного JSON
+    private func fetchList(_ completion: @escaping (Result<Data, DownloadError>) -> Void) {
         spinner.startAnimating()
-        let downloadService = DownloadService(viewController: self)
-        downloadService.downloadList()
+        let downloadService = DownloadService()
+        let completionHandler : (Data?, URLResponse?, Error?) -> Void = { data , response, error in
+            
+            if let error = error  {
+                completion(.failure(.downloadError(error)))
+                return
+            }
+           
+            if data == nil  {
+                completion(.failure(.unknown("Получен пустой ответ")))
+                return
+            }
+            
+            if let data = data {
+                completion(.success(data))
+                return
+            }
+            
+            completion(.failure(.unknown("Ошибка загрузки")))
+
+        }
+        
+        downloadService.downloadList(completionHandler: completionHandler)
     }
     
-    func showTableView() {
-        spinner.stopAnimating()
-        let pokemons = DataStore.gelList()
-        let tableViewController = TableViewController(pokemons: pokemons)
-        self.navigationController?.pushViewController(tableViewController, animated: true)
+    private func updateList() {
+        
+        DispatchQueue.main.async(execute: { [weak self] in
+            self?.spinner.stopAnimating()
+            self?.tableView.isHidden = false
+            self?.tableView.reloadData()
+        })
     }
+}
+
+extension ViewController : UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return store.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") else {
+            return UITableViewCell()
+        }
+        
+        cell.textLabel?.text = store[indexPath.row]
+        return cell
+    }
+   
     
 }
